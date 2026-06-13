@@ -11,9 +11,6 @@ const Navbar = () => {
         <Link to="/requests" className="hover:underline">
           Requests
         </Link>
-        <Link to="/login" className="hover:underline">
-          Login
-        </Link>
       </div>
     </nav>
   )
