@@ -3,7 +3,6 @@ import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import Profile from './pages/auth/Profile'
 import DonorList from './pages/donors/DonorList'
-import DonorSearch from './pages/donors/DonorSearch'
 import RequestList from './pages/requests/RequestList'
 import NewRequest from './pages/requests/NewRequest'
 import Dashboard from './pages/dashboard/Dashboard'
@@ -21,7 +20,6 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/donors" element={<DonorList />} />
-        <Route path="/donors/search" element={<DonorSearch />} />
         <Route path="/requests" element={<RequestList />} />
         <Route path="/requests/new" element={<NewRequest />} />
         <Route path="/dashboard" element={<Dashboard />} />
