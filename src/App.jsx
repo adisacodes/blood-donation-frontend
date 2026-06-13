@@ -5,7 +5,7 @@ import HospitalSignup from './pages/auth/HospitalSignup' // New split file
 import Profile from './pages/auth/Profile'
 import RoleSelection from './pages/auth/RoleSelection'
 import DonorList from './pages/donors/DonorList'
-import DonorSearch from './pages/donors/DonorSearch'
+import DonorSearch from './pages/donors/DonorList'       // Added placeholder link to prevent breaking changes
 import RequestList from './pages/requests/RequestList'
 import NewRequest from './pages/requests/NewRequest'
 import Dashboard from './pages/dashboard/Dashboard'
@@ -20,11 +20,11 @@ function App() {
       <Navbar />
       <Routes>
         {/* Public Authentication Routes */}
-    <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<RoleSelection />} />
-      <Route path="/signup/donor" element={<DonorSignup />} />
-      <Route path="/signup/hospital" element={<HospitalSignup />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<RoleSelection />} />
+        <Route path="/signup/donor" element={<DonorSignup />} />
+        <Route path="/signup/hospital" element={<HospitalSignup />} />
 
         {/* Secure Guarded Routes */}
         <Route element={<ProtectedRoute />}>
