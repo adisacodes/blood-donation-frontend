@@ -27,22 +27,25 @@ const DonorSignup = () => {
     e.preventDefault();
     setError('');
 
-    // Client-side confirmation matching
+    // Client-side validation check
     if (formData.password !== formData.confirmPassword) {
       return setError('Passwords do not match.');
     }
 
-    setLoading(false);
-    // Destructure to separate confirmPassword from what the backend expects
+    // Destructure to isolate confirmPassword out of the backend payload object
     const { confirmPassword, ...backendData } = formData;
 
     try {
       setLoading(true);
-      // Calls your updated dynamic endpoint handler
+      
+      // 1. Send signup payload to backend
       await authService.signup(backendData, 'donor');
       
-      // Auto-redirect to login workspace on successful creation
-      navigate('/login');
+      // 2. Automatically log them in right after signing up so they don't have to log in manually!
+      await authService.login(formData.email, formData.password);
+      
+      // 3. SUCCESS REDIRECT: Go straight to your donor dashboard page layout
+      navigate('/donors');
     } catch (err) {
       setError(err.toString());
     } finally {
@@ -67,7 +70,7 @@ const DonorSignup = () => {
             name="first_name"
             placeholder="First Name"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.first_name}
             onChange={handleChange}
           />
@@ -77,7 +80,7 @@ const DonorSignup = () => {
             name="last_name"
             placeholder="Last Name"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.last_name}
             onChange={handleChange}
           />
@@ -87,7 +90,7 @@ const DonorSignup = () => {
             name="email"
             placeholder="Email Address"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.email}
             onChange={handleChange}
           />
@@ -97,7 +100,7 @@ const DonorSignup = () => {
             name="phone_number"
             placeholder="Phone Number"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.phone_number}
             onChange={handleChange}
           />
@@ -105,7 +108,7 @@ const DonorSignup = () => {
           <select 
             name="blood_group"
             required
-            className="w-full border p-3 rounded-lg bg-white"
+            className="w-full border p-3 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.blood_group}
             onChange={handleChange}
           >
@@ -125,7 +128,7 @@ const DonorSignup = () => {
             name="password"
             placeholder="Password"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.password}
             onChange={handleChange}
           />
@@ -135,7 +138,7 @@ const DonorSignup = () => {
             name="confirmPassword"
             placeholder="Confirm Password"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.confirmPassword}
             onChange={handleChange}
           />

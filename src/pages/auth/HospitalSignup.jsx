@@ -27,17 +27,25 @@ const HospitalSignup = () => {
     e.preventDefault();
     setError('');
 
+    // Client-side password validation
     if (formData.password !== formData.confirmPassword) {
       return setError('Passwords do not match.');
     }
 
+    // Isolate confirmPassword from the actual database schema keys
     const { confirmPassword, ...backendData } = formData;
 
     try {
       setLoading(true);
-      // Triggers the specific backend hospital router pipeline
+      
+      // 1. Send signup information to the backend endpoint
       await authService.signup(backendData, 'hospital');
-      navigate('/login');
+      
+      // 2. Automatically log them in seamlessly using their newly created credentials
+      await authService.login(formData.email, formData.password);
+      
+      // 3. SUCCESS REDIRECT: Send hospitals straight to their request dashboard path
+      navigate('/requests');
     } catch (err) {
       setError(err.toString());
     } finally {
@@ -62,7 +70,7 @@ const HospitalSignup = () => {
             name="hospital_name"
             placeholder="Hospital Name"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.hospital_name}
             onChange={handleChange}
           />
@@ -72,7 +80,7 @@ const HospitalSignup = () => {
             name="license_number"
             placeholder="License Number"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.license_number}
             onChange={handleChange}
           />
@@ -82,7 +90,7 @@ const HospitalSignup = () => {
             name="contact_person"
             placeholder="Contact Person"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.contact_person}
             onChange={handleChange}
           />
@@ -92,7 +100,7 @@ const HospitalSignup = () => {
             name="email"
             placeholder="Email Address"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.email}
             onChange={handleChange}
           />
@@ -102,7 +110,7 @@ const HospitalSignup = () => {
             name="phone_number"
             placeholder="Phone Number"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.phone_number}
             onChange={handleChange}
           />
@@ -112,7 +120,7 @@ const HospitalSignup = () => {
             name="password"
             placeholder="Password"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.password}
             onChange={handleChange}
           />
@@ -122,7 +130,7 @@ const HospitalSignup = () => {
             name="confirmPassword"
             placeholder="Confirm Password"
             required
-            className="w-full border p-3 rounded-lg"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.confirmPassword}
             onChange={handleChange}
           />

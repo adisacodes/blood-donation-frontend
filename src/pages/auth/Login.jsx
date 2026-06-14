@@ -15,9 +15,20 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await authService.login(email, password);
-      // Route user straight to the dashboard workspace upon passing auth check
-      navigate('/dashboard');
+      const userData = await authService.login(email, password);
+      const role = userData?.role; 
+
+     
+      if (role === 'admin') {
+        navigate('/dashboard');          
+      } else if (role === 'donor') {
+        navigate('/donors');             
+      } else if (role === 'hospital') {
+        navigate('/requests');            
+      } else {
+        navigate('/dashboard');           
+      }
+
     } catch (err) {
       setError(err.toString());
     } finally {
@@ -65,21 +76,21 @@ export default function Login() {
             </div>
             <div>
               <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Password
-                  </label>
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Password
+              </label>
 
-                  <input
-                    id="password"
-                    type="password"
-                    required
-                    className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+              <input
+                id="password"
+                type="password"
+                required
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
           </div>
 
@@ -96,7 +107,6 @@ export default function Login() {
           </div>
         </form>
 
-        {/* Updated Split Pathway Links */}
         <div className="text-center mt-6 space-y-2 border-t border-gray-100 pt-4">
           <p className="text-sm text-gray-600">
             New to the system?
