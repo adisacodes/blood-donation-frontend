@@ -10,10 +10,12 @@ const api = axios.create({
 });
 
 export const authService = {
-  // Register Donor or Hospital
-  signup: async (userData) => {
+  // 1. Updated Signup to direct to the specific donor/facility routes
+  signup: async (userData, role = 'donor') => {
     try {
-      const response = await api.post('/api/auth/signup', userData);
+      // Constructs '/api/auth/signup/donor' or '/api/auth/signup/hospital'
+      const endpoint = `/api/auth/signup/${role}`;
+      const response = await api.post(endpoint, userData);
       return response.data;
     } catch (error) {
       throw (
@@ -24,21 +26,24 @@ export const authService = {
     }
   },
 
-  // Login
+  // 2. Cleaned Login path utilizing unified JSON payloads and storage
   login: async (email, password) => {
     try {
-      const response = await api.post('/auth/login', {
-  email,
-  password,
-});
+      // Directs to the correct JSON token path matching backend expectations
+      const response = await api.post('/api/auth/token', {
+        email: email,
+        password: password
+      });
 
-      if (response.data.access_token) {
-        localStorage.setItem('token', response.data.access_token);
+      // Safely resolves whether backend returned a raw string token or standard JSON object
+      const token = typeof response.data === 'string' ? response.data : response.data.access_token;
 
+      if (token) {
+        localStorage.setItem('token', token);
+        
         if (response.data.role) {
           localStorage.setItem('role', response.data.role);
         }
-
         if (response.data.user_id) {
           localStorage.setItem('user_id', response.data.user_id);
         }
@@ -46,6 +51,13 @@ export const authService = {
 
       return response.data;
     } catch (error) {
+      // Handle FastAPI Pydantic structural validation errors elegantly
+      if (error.response?.status === 422 && error.response?.data?.detail) {
+        const validationErrors = error.response.data.detail;
+        console.error("Backend validation error details:", validationErrors);
+        throw `Validation Error: ${validationErrors[0]?.msg || 'Invalid data layout'}`;
+      }
+      
       throw (
         error.response?.data?.detail ||
         'Invalid email or password.'
