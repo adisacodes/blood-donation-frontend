@@ -27,19 +27,10 @@ export const authService = {
   // Login
   login: async (email, password) => {
     try {
-      const formData = new URLSearchParams();
-      formData.append('username', email); // FastAPI OAuth2 expects username
-      formData.append('password', password);
-
-      const response = await axios.post(
-        `${API_URL}/api/auth/token`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        }
-      );
+      const response = await api.post('/auth/login', {
+  email,
+  password,
+});
 
       if (response.data.access_token) {
         localStorage.setItem('token', response.data.access_token);

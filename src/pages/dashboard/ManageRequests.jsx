@@ -1,6 +1,38 @@
+
+import { useState, useEffect } from "react"
 import Sidebar from "../../components/Sidebar"
 
 const ManageRequests = () => {
+  const [requests, setRequests] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch("http://localhost:8000/admin/requests")
+      .then(res => res.json())
+      .then(data => {
+        setRequests(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error("Error:", err)
+        setLoading(false)
+      })
+  }, [])
+
+  const handleStatus = (id, status) => {
+    fetch(`http://localhost:8000/admin/requests/${id}?status=${status}`, {
+      method: "PUT"
+    })
+      .then(res => res.json())
+      .then(() => {
+        setRequests(requests.map(req =>
+          req.id === id ? { ...req, status } : req
+        ))
+      })
+  }
+
+  if (loading) return <div className="p-6">Loading... ⏳</div>
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       <Sidebar />
@@ -9,57 +41,69 @@ const ManageRequests = () => {
           Manage Requests 🩸
         </h1>
 
-        {/* Mobile view - cards */}
+        {/* Mobile view */}
         <div className="block md:hidden">
-          <div className="bg-white shadow-md rounded-lg p-4 mb-4">
-            <p className="font-bold">Nairobi Hospital</p>
-            <p className="text-gray-500">Blood Type: A+</p>
-            <p className="text-gray-500">Units: 2</p>
-            <p className="text-yellow-500 font-bold">Status: Pending</p>
-            <div className="flex gap-2 mt-2">
-              <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 w-full">
-                Approve
-              </button>
-              <button className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 w-full">
-                Reject
-              </button>
+          {requests.length > 0 ? requests.map(req => (
+            <div key={req.id} className="bg-white shadow-md rounded-lg p-4 mb-4">
+              <p className="font-bold">{req.requested_by}</p>
+              <p className="text-gray-500">Blood Type: {req.blood_type}</p>
+              <p className="text-gray-500">Units: {req.units}</p>
+              <p className={`font-bold ${req.status === 'pending' ? 'text-yellow-500' : req.status === 'approved' ? 'text-green-500' : 'text-red-500'}`}>
+                Status: {req.status}
+              </p>
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={() => handleStatus(req.id, 'approved')}
+                  className="bg-green-600 text-white px-3 py-1 rounded w-full">
+                  Approve
+                </button>
+                <button
+                  onClick={() => handleStatus(req.id, 'rejected')}
+                  className="bg-red-700 text-white px-3 py-1 rounded w-full">
+                  Reject
+                </button>
+              </div>
             </div>
-          </div>
+          )) : <p className="text-gray-500">No requests found</p>}
         </div>
 
-        {/* Desktop view - table */}
+        {/* Desktop view */}
         <div className="hidden md:block">
           <table className="w-full bg-white shadow-md rounded-lg">
             <thead className="bg-red-700 text-white">
               <tr>
-                <th className="p-3 text-left">Hospital</th>
+                <th className="p-3 text-left">Requested By</th>
                 <th className="p-3 text-left">Blood Type</th>
                 <th className="p-3 text-left">Units</th>
-                <th className="p-3 text-left">Date</th>
                 <th className="p-3 text-left">Status</th>
                 <th className="p-3 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b">
-                <td className="p-3">Nairobi Hospital</td>
-                <td className="p-3">A+</td>
-                <td className="p-3">2</td>
-                <td className="p-3">2024-06-15</td>
-                <td className="p-3">
-                  <span className="bg-yellow-100 text-yellow-600 px-2 py-1 rounded">
-                    Pending
-                  </span>
-                </td>
-                <td className="p-3 flex gap-2">
-                  <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
-                    Approve
-                  </button>
-                  <button className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800">
-                    Reject
-                  </button>
-                </td>
-              </tr>
+              {requests.length > 0 ? requests.map(req => (
+                <tr key={req.id} className="border-b">
+                  <td className="p-3">{req.requested_by}</td>
+                  <td className="p-3">{req.blood_type}</td>
+                  <td className="p-3">{req.units}</td>
+                  <td className="p-3">
+                    <span className={`px-2 py-1 rounded text-white ${req.status === 'pending' ? 'bg-yellow-500' : req.status === 'approved' ? 'bg-green-500' : 'bg-red-500'}`}>
+                      {req.status}
+                    </span>
+                  </td>
+                  <td className="p-3 flex gap-2">
+                    <button
+                      onClick={() => handleStatus(req.id, 'approved')}
+                      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleStatus(req.id, 'rejected')}
+                      className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800">
+                      Reject
+                    </button>
+                  </td>
+                </tr>
+              )) : <tr><td colSpan="5" className="p-3 text-gray-500">No requests found</td></tr>}
             </tbody>
           </table>
         </div>
