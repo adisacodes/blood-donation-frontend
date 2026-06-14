@@ -13,7 +13,7 @@ export const authService = {
   // 1. Updated Signup to direct to the specific donor/facility routes
   signup: async (userData, role = 'donor') => {
     try {
-      // Constructs '/api/auth/signup/donor' or '/api/auth/signup/hospital' (or facility)
+      // Constructs '/api/auth/signup/donor' or '/api/auth/signup/hospital'
       const endpoint = `/api/auth/signup/${role}`;
       const response = await api.post(endpoint, userData);
       return response.data;
@@ -26,31 +26,20 @@ export const authService = {
     }
   },
 
-  
-login: async (email, password) => {
+  // 2. Cleaned Login path utilizing unified JSON payloads and storage
+  login: async (email, password) => {
     try {
-HEAD
-      const response = await api.post('/auth/login', {
-  email,
-  password,
-});
-
-      if (response.data.access_token) {
-        localStorage.setItem('token', response.data.access_token);
-
-      
+      // Directs to the correct JSON token path matching backend expectations
       const response = await api.post('/api/auth/token', {
         email: email,
         password: password
       });
 
-      
+      // Safely resolves whether backend returned a raw string token or standard JSON object
       const token = typeof response.data === 'string' ? response.data : response.data.access_token;
- e8dceae (fix: implement state forms for donor and hospital signups and match authService to json token path)
 
       if (token) {
         localStorage.setItem('token', token);
-        
         
         if (response.data.role) {
           localStorage.setItem('role', response.data.role);
@@ -62,7 +51,7 @@ HEAD
 
       return response.data;
     } catch (error) {
-  
+      // Handle FastAPI Pydantic structural validation errors elegantly
       if (error.response?.status === 422 && error.response?.data?.detail) {
         const validationErrors = error.response.data.detail;
         console.error("Backend validation error details:", validationErrors);
