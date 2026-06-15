@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react"
 import Sidebar from "../../components/Sidebar"
 
@@ -7,7 +6,7 @@ const ManageRequests = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("http://localhost:8000/admin/requests")
+    fetch("http://localhost:8000/api/admin/requests")
       .then(res => res.json())
       .then(data => {
         setRequests(data)
@@ -20,7 +19,7 @@ const ManageRequests = () => {
   }, [])
 
   const handleStatus = (id, status) => {
-    fetch(`http://localhost:8000/admin/requests/${id}?status=${status}`, {
+    fetch(`http://localhost:8000/api/admin/requests/${id}?status=${status}`, {
       method: "PUT"
     })
       .then(res => res.json())
@@ -52,58 +51,85 @@ const ManageRequests = () => {
                 Status: {req.status}
               </p>
               <div className="flex gap-2 mt-2">
-                <button
-                  onClick={() => handleStatus(req.id, 'approved')}
-                  className="bg-green-600 text-white px-3 py-1 rounded w-full">
-                  Approve
-                </button>
-                <button
-                  onClick={() => handleStatus(req.id, 'rejected')}
-                  className="bg-red-700 text-white px-3 py-1 rounded w-full">
-                  Reject
-                </button>
+                {req.status === 'pending' && (
+                  <>
+                    <button
+                      onClick={() => handleStatus(req.id, 'approved')}
+                      className="bg-green-600 text-white px-3 py-1 rounded w-full">
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleStatus(req.id, 'rejected')}
+                      className="bg-red-700 text-white px-3 py-1 rounded w-full">
+                      Reject
+                    </button>
+                  </>
+                )}
+                {req.status !== 'pending' && (
+                  <p className="text-gray-400 text-sm">No actions available</p>
+                )}
               </div>
             </div>
           )) : <p className="text-gray-500">No requests found</p>}
         </div>
 
-        {/* Desktop view */}
+        {/* Desktop view - WITH Approve/Reject Buttons */}
         <div className="hidden md:block">
-          <table className="w-full bg-white shadow-md rounded-lg">
+          <table className="w-full border-collapse bg-white shadow-md rounded-lg">
             <thead className="bg-red-700 text-white">
               <tr>
-                <th className="p-3 text-left">Requested By</th>
+                <th className="p-3 text-left">ID</th>
+                <th className="p-3 text-left">Hospital / Source</th>
                 <th className="p-3 text-left">Blood Type</th>
                 <th className="p-3 text-left">Units</th>
                 <th className="p-3 text-left">Status</th>
+                <th className="p-3 text-left">Date</th>
                 <th className="p-3 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
               {requests.length > 0 ? requests.map(req => (
-                <tr key={req.id} className="border-b">
-                  <td className="p-3">{req.requested_by}</td>
-                  <td className="p-3">{req.blood_type}</td>
+                <tr key={req.id} className="border-b hover:bg-gray-50">
+                  <td className="p-3 font-semibold">{req.id}</td>
+                  <td className="p-3 font-medium text-gray-900">
+                    {req.requested_by || "Unknown Hospital"}
+                  </td>
+                  <td className="p-3 text-red-600 font-bold">{req.blood_type}</td>
                   <td className="p-3">{req.units}</td>
                   <td className="p-3">
-                    <span className={`px-2 py-1 rounded text-white ${req.status === 'pending' ? 'bg-yellow-500' : req.status === 'approved' ? 'bg-green-500' : 'bg-red-500'}`}>
+                    <span className={`px-2 py-1 text-xs rounded font-semibold ${
+                      req.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                      req.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                      'bg-red-100 text-red-800'
+                    }`}>
                       {req.status}
                     </span>
                   </td>
-                  <td className="p-3 flex gap-2">
-                    <button
-                      onClick={() => handleStatus(req.id, 'approved')}
-                      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => handleStatus(req.id, 'rejected')}
-                      className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800">
-                      Reject
-                    </button>
+                  <td className="p-3 text-gray-500 text-sm">{req.date}</td>
+                  <td className="p-3">
+                    {req.status === 'pending' ? (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleStatus(req.id, 'approved')}
+                          className="bg-green-600 text-white px-3 py-1 rounded text-sm">
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleStatus(req.id, 'rejected')}
+                          className="bg-red-700 text-white px-3 py-1 rounded text-sm">
+                          Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-sm">No actions</span>
+                    )}
                   </td>
                 </tr>
-              )) : <tr><td colSpan="5" className="p-3 text-gray-500">No requests found</td></tr>}
+              )) : (
+                <tr>
+                  <td colSpan="7" className="p-6 text-center text-gray-500 italic">No requests found</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

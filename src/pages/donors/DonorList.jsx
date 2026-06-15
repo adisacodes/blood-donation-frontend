@@ -7,7 +7,7 @@ const DonorList = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("http://localhost:8000/donors")
+    fetch("http://localhost:8000/api/donors/")
       .then(res => res.json())
       .then(data => {
         setDonors(data)
@@ -20,8 +20,8 @@ const DonorList = () => {
   }, [])
 
   const filteredDonors = donors.filter(donor =>
-    donor.blood_type.toLowerCase().includes(search.toLowerCase())
-  )
+  donor.blood_group?.toLowerCase().includes(search.toLowerCase())
+)
 
   if (loading) return <div className="p-6">Loading... ⏳</div>
 
@@ -41,7 +41,7 @@ const DonorList = () => {
             filteredDonors.map((donor, index) => (
               <div key={index} className="bg-white shadow-md rounded-lg p-4 border-l-4 border-red-700">
                 <p className="font-bold text-lg">Donor #{donor.id}</p>
-                <p className="text-gray-500">Blood Type: {donor.blood_type}</p>
+                <p className="text-gray-500">Blood Type: {donor.blood_group}</p>
                 <p className="text-gray-500">Location: {donor.location}</p>
               </div>
             ))
