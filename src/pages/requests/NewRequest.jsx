@@ -1,133 +1,133 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 
-const NewRequest = () => {
+// ✅ FIXED: Changed to hospital endpoint
+const API_BASE_URL = "http://localhost:8000/api/blood-requests";
+
+export default function NewRequest({ onRequestCreated }) {
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    bloodGroup: "",
-    hospital: "",
-    location: "",
-    units: "",
-    urgency: "",
-    notes: ""
+    requested_by: '',
+    blood_type: 'O+',
+    units: 1,
+    date: new Date().toISOString().split('T')[0]
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState(null);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'units' ? parseInt(value, 10) || 0 : value
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setMessage(null);
 
-    const existing = JSON.parse(localStorage.getItem("bloodRequests")) || [];
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('user')) || {};
 
-    const newRequest = {
-      id: Date.now(),
-      ...formData
-    };
+      const response = await fetch(`${API_BASE_URL}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          ...formData,
+          requested_by: currentUser.hospital_name || 'New Hospital Account'
+        })
+      });
 
-    localStorage.setItem(
-      "bloodRequests",
-      JSON.stringify([...existing, newRequest])
-    );
+      if (!response.ok) throw new Error("Failed to create blood request");
 
-    alert("Blood request submitted successfully!");
+      const newRequest = await response.json();
+      setMessage({ type: 'success', text: 'Blood request submitted successfully!' });
+      
+      setFormData(prev => ({ ...prev, requested_by: '', units: 1 }));
 
-    setFormData({
-      name: "",
-      phone: "",
-      bloodGroup: "",
-      hospital: "",
-      location: "",
-      units: "",
-      urgency: "",
-      notes: ""
-    });
+      if (onRequestCreated) {
+        onRequestCreated(newRequest);
+      }
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white shadow rounded">
-      <h2 className="text-2xl font-bold mb-4">Create Blood Request</h2>
+    <div style={{ padding: '20px', maxWidth: '500px', margin: '20px auto', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#F9F9F9' }}>
+      <h3>Create New Blood Request</h3>
+      
+      {message && (
+        <div style={{ padding: '10px', marginBottom: '15px', borderRadius: '4px', color: 'white', backgroundColor: message.type === 'success' ? '#137333' : '#c5221f' }}>
+          {message.text}
+        </div>
+      )}
 
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', marginBottom: '4px' }}>Requested By (Hospital / Person):</label>
+          <input 
+            type="text" 
+            name="requested_by" 
+            value={formData.requested_by} 
+            onChange={handleChange} 
+            required 
+            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+          />
+        </div>
 
-        <input
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full p-2 border"
-        />
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', marginBottom: '4px' }}>Blood Type:</label>
+          <select 
+            name="blood_type" 
+            value={formData.blood_type} 
+            onChange={handleChange}
+            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+          >
+            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
 
-        <input
-          name="phone"
-          placeholder="Phone Number"
-          value={formData.phone}
-          onChange={handleChange}
-          className="w-full p-2 border"
-        />
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', marginBottom: '4px' }}>Units Required:</label>
+          <input 
+            type="number" 
+            name="units" 
+            min="1" 
+            value={formData.units} 
+            onChange={handleChange} 
+            required 
+            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+          />
+        </div>
 
-        <input
-          name="bloodGroup"
-          placeholder="Blood Group"
-          value={formData.bloodGroup}
-          onChange={handleChange}
-          className="w-full p-2 border"
-        />
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '4px' }}>Required Date:</label>
+          <input 
+            type="date" 
+            name="date" 
+            value={formData.date} 
+            onChange={handleChange} 
+            required 
+            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+          />
+        </div>
 
-        <input
-          name="hospital"
-          placeholder="Hospital"
-          value={formData.hospital}
-          onChange={handleChange}
-          className="w-full p-2 border"
-        />
-
-        <input
-          name="location"
-          placeholder="Location"
-          value={formData.location}
-          onChange={handleChange}
-          className="w-full p-2 border"
-        />
-
-        <input
-          name="units"
-          placeholder="Units Needed"
-          value={formData.units}
-          onChange={handleChange}
-          className="w-full p-2 border"
-        />
-
-        <select
-          name="urgency"
-          value={formData.urgency}
-          onChange={handleChange}
-          className="w-full p-2 border"
+        <button 
+          type="submit" 
+          disabled={submitting}
+          style={{ width: '100%', padding: '10px', backgroundColor: '#FF0000', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
         >
-          <option value="">Select Urgency</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-
-        <textarea
-          name="notes"
-          placeholder="Additional Notes"
-          value={formData.notes}
-          onChange={handleChange}
-          className="w-full p-2 border"
-        />
-
-        <button
-          type="submit"
-          className="bg-red-500 text-white px-4 py-2 rounded w-full"
-        >
-          Submit Request
+          {submitting ? 'Submitting...' : 'Submit Request'}
         </button>
       </form>
     </div>
   );
-};
-
-export default NewRequest;
+}
