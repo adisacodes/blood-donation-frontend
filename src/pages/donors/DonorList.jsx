@@ -7,7 +7,7 @@ const DonorList = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("https://blood-donation-backend-yqzf.onrender.comapi/donors/")
+    fetch("https://blood-donation-backend-yqzf.onrender.com/api/donors")
       .then(res => res.json())
       .then(data => {
         setDonors(data)
