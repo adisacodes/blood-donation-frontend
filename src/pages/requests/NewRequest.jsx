@@ -37,7 +37,7 @@ export default function NewRequest({ onRequestCreated }) {
         },
         body: JSON.stringify({
           ...formData,
-          requested_by: currentUser.hospital_name || 'New Hospital Account'
+          requested_by: formData.requested_by
         })
       });
 

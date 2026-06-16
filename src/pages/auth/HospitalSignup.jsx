@@ -27,31 +27,27 @@ const HospitalSignup = () => {
     e.preventDefault();
     setError('');
 
+    // Client-side password validation
     if (formData.password !== formData.confirmPassword) {
       return setError('Passwords do not match.');
     }
 
+    // Isolate confirmPassword from the actual database schema keys
     const { confirmPassword, ...backendData } = formData;
 
     try {
       setLoading(true);
       
-      // 1. Signup first
+      // 1. Send signup information to the backend endpoint
       await authService.signup(backendData, 'hospital');
       
-      // 2. Login and GET the response
-      const loginResponse = await authService.login(formData.email, formData.password);
+      // 2. 🌟 FIXED FLOW: Removed authService.login() to prevent automatic entry.
+      // Display a notification so they know it worked, then push to login screen.
+      alert('Hospital profile registered successfully! Please log in to your portal.');
       
-      // 3. Create userSessionData WITH hospital_name (THIS IS THE FIX!)
-      const userSessionData = {
-        hospital_name: formData.hospital_name,  // ✅ ADDED THIS LINE
-        email: formData.email,
-        role: loginResponse.role
-      };
-      localStorage.setItem('user', JSON.stringify(userSessionData));
+      // 3. SUCCESS REDIRECT: Send them to the manual sign in screen 
+      navigate('/login');
       
-      // 4. Navigate to hospital request page
-      navigate('/requests');
     } catch (err) {
       setError(err.toString());
     } finally {

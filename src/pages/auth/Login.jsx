@@ -18,13 +18,7 @@ export default function Login() {
       const userData = await authService.login(email, password);
       const role = userData?.role; 
 
-      // ✅ FIX: Also save to 'user' localStorage for consistency
-      const userSessionData = {
-        email: email,
-        role: role
-      };
-      localStorage.setItem('user', JSON.stringify(userSessionData));
-
+     
       if (role === 'admin') {
         navigate('/dashboard');          
       } else if (role === 'donor') {

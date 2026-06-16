@@ -44,8 +44,9 @@ const DonorSignup = () => {
       // 2. Automatically log them in right after signing up so they don't have to log in manually!
       await authService.login(formData.email, formData.password);
       
-      // 3. SUCCESS REDIRECT: Go straight to your donor dashboard page layout
-      navigate('/donors');
+      // 3. SUCCESS REDIRECT: Fixed to match your exact dashboard setup route path! 🩸
+      navigate('/donor-dashboard');
+      
     } catch (err) {
       setError(err.toString());
     } finally {
