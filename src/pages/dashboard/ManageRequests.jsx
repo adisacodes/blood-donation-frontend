@@ -6,7 +6,7 @@ const ManageRequests = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/admin/requests")
+    fetch("https://blood-donation-backend-yqzf.onrender.com/api/admin/requests")
       .then(res => res.json())
       .then(data => {
         setRequests(data)
@@ -19,7 +19,7 @@ const ManageRequests = () => {
   }, [])
 
   const handleStatus = (id, status) => {
-    fetch(`http://localhost:8000/api/admin/requests/${id}?status=${status}`, {
+    fetch(`https://blood-donation-backend-yqzf.onrender.com/api/admin/requests/${id}?status=${status}`, {
       method: "PUT"
     })
       .then(res => res.json())

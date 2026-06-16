@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // ✅ FIXED: Changed to hospital endpoint
-const API_BASE_URL = "http://localhost:8000/api/blood-requests";
+const API_BASE_URL = "https://blood-donation-backend-yqzf.onrender.com/api/hospital/requests";
 
 export default function NewRequest({ onRequestCreated }) {
   const [formData, setFormData] = useState({

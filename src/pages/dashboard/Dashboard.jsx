@@ -17,7 +17,7 @@ const Dashboard = () => {
     const token = authService.getToken()
 
    
-    fetch("http://localhost:8000/api/admin/dashboard", {
+    fetch("https://blood-donation-backend-yqzf.onrender.com/api/admin/dashboard", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

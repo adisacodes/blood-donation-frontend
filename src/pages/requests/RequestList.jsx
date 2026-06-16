@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import NewRequest from './NewRequest';
 
-const API_BASE_URL = "http://localhost:8000/api/admin/requests";
-
+const API_BASE_URL = "https://blood-donation-backend-yqzf.onrender.com/api/requests";
 export default function RequestList() {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);

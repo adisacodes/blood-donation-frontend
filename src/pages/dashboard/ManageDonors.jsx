@@ -9,7 +9,7 @@ const ManageDonors = () => {
 
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/admin/donors")
+    fetch("https://blood-donation-backend-yqzf.onrender.com/api/admin/donors")
       .then(res => {
         if (!res.ok) throw new Error("Failed to fetch donors")
         return res.json()
@@ -32,7 +32,7 @@ const ManageDonors = () => {
     setDeletingId(id)
 
 
-    fetch(`http://localhost:8000/api/admin/donors/${id}`, {
+    fetch(`https://blood-donation-backend-yqzf.onrender.com/api/admin/donors/${id}`, {
       method: "DELETE"
     })
       .then(res => {
